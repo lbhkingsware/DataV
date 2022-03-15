@@ -1,468 +1,502 @@
 <template>
-  <div class="dv-scroll-board" :ref="ref">
-    <div class="header" v-if="header.length && mergedConfig" :style="`background-color: ${mergedConfig.headerBGC};`">
-      <div
-        class="header-item"
-        v-for="(headerItem, i) in header"
-        :key="`${headerItem}${i}`"
-        :style="`
+	<div class="dv-scroll-board" :ref="ref">
+		<div
+			class="header"
+			v-if="header.length && mergedConfig"
+			:style="`background-color: ${mergedConfig.headerBGC};`"
+		>
+			<div
+				class="header-item"
+				v-for="(headerItem, i) in header"
+				:key="`${headerItem}${i}`"
+				:style="`
           height: ${mergedConfig.headerHeight}px;
           line-height: ${mergedConfig.headerHeight}px;
           width: ${widths[i]}px;
         `"
-        :align="aligns[i]"
-        v-html="headerItem"
-      />
-    </div>
+				:align="aligns[i]"
+				v-html="headerItem"
+			/>
+		</div>
 
-    <div
-      v-if="mergedConfig"
-      class="rows"
-      :style="`height: ${height - (header.length ? mergedConfig.headerHeight : 0)}px;`"
-    >
-      <div
-        class="row-item"
-        v-for="(row, ri) in rows"
-        :key="`${row.toString()}${row.scroll}`"
-        :style="`
+		<div
+			v-if="mergedConfig"
+			class="rows"
+			:style="`height: ${
+				height - (header.length ? mergedConfig.headerHeight : 0)
+			}px;`"
+		>
+			<div
+				class="row-item"
+				v-for="(row, ri) in rows"
+				:key="`${row.toString()}${row.scroll}`"
+				:style="`
           height: ${heights[ri]}px;
           line-height: ${heights[ri]}px;
-          background-color: ${mergedConfig[row.rowIndex % 2 === 0 ? 'evenRowBGC' : 'oddRowBGC']};
+          background-color: ${
+						mergedConfig[row.rowIndex % 2 === 0 ? 'evenRowBGC' : 'oddRowBGC']
+					};
+          background: ${background[ri]};
         `"
-      >
-        <div
-          class="ceil"
-          v-for="(ceil, ci) in row.ceils"
-          :key="`${ceil}${ri}${ci}`"
-          :style="`width: ${widths[ci]}px;`"
-          :align="aligns[ci]"
-          v-html="ceil"
-          @click="emitEvent('click', ri, ci, row, ceil)"
-          @mouseenter="handleHover(true, ri, ci, row, ceil)"
-          @mouseleave="handleHover(false)"
-        />
-
-      </div>
-    </div>
-  </div>
+			>
+				<div
+					class="ceil"
+					v-for="(ceil, ci) in row.ceils"
+					:key="`${ceil}${ri}${ci}`"
+					:style="`width: ${widths[ci]}px;`"
+					:align="aligns[ci]"
+					v-html="ceil"
+					@click="emitEvent('click', ri, ci, row, ceil)"
+					@mouseenter="handleHover(true, ri, ci, row, ceil)"
+					@mouseleave="handleHover(false)"
+				/>
+			</div>
+		</div>
+	</div>
 </template>
 
 <script>
-import autoResize from '../../../mixin/autoResize'
-
-import { deepMerge } from '@jiaminghi/charts/lib/util/index'
-
-import { deepClone } from '@jiaminghi/c-render/lib/plugin/util'
-
-export default {
-  name: 'DvScrollBoard',
-  mixins: [autoResize],
-  props: {
-    config: {
-      type: Object,
-      default: () => ({})
-    }
-  },
-  data () {
-    return {
-      ref: 'scroll-board',
-
-      defaultConfig: {
-        /**
-         * @description Board header
-         * @type {Array<String>}
-         * @default header = []
-         * @example header = ['column1', 'column2', 'column3']
-         */
-        header: [],
-        /**
-         * @description Board data
-         * @type {Array<Array>}
-         * @default data = []
-         */
-        data: [],
-        /**
-         * @description Row num
-         * @type {Number}
-         * @default rowNum = 5
-         */
-        rowNum: 5,
-        /**
-         * @description Header background color
-         * @type {String}
-         * @default headerBGC = '#00BAFF'
-         */
-        headerBGC: '#00BAFF',
-        /**
-         * @description Odd row background color
-         * @type {String}
-         * @default oddRowBGC = '#003B51'
-         */
-        oddRowBGC: '#003B51',
-        /**
-         * @description Even row background color
-         * @type {String}
-         * @default evenRowBGC = '#003B51'
-         */
-        evenRowBGC: '#0A2732',
-        /**
-         * @description Scroll wait time
-         * @type {Number}
-         * @default waitTime = 2000
-         */
-        waitTime: 2000,
-        /**
-         * @description Header height
-         * @type {Number}
-         * @default headerHeight = 35
-         */
-        headerHeight: 35,
-        /**
-         * @description Column width
-         * @type {Array<Number>}
-         * @default columnWidth = []
-         */
-        columnWidth: [],
-        /**
-         * @description Column align
-         * @type {Array<String>}
-         * @default align = []
-         * @example align = ['left', 'center', 'right']
-         */
-        align: [],
-        /**
-         * @description Show index
-         * @type {Boolean}
-         * @default index = false
-         */
-        index: false,
-        /**
-         * @description index Header
-         * @type {String}
-         * @default indexHeader = '#'
-         */
-        indexHeader: '#',
-        /**
-         * @description Carousel type
-         * @type {String}
-         * @default carousel = 'single'
-         * @example carousel = 'single' | 'page'
-         */
-        carousel: 'single',
-        /**
-         * @description Pause scroll when mouse hovered
-         * @type {Boolean}
-         * @default hoverPause = true
-         * @example hoverPause = true | false
-         */
-        hoverPause: true
-      },
+	import autoResize from '../../../mixin/autoResize'
+
+	import { deepMerge } from '@jiaminghi/charts/lib/util/index'
+
+	import { deepClone } from '@jiaminghi/c-render/lib/plugin/util'
+
+	export default {
+		name: 'DvScrollBoard',
+		mixins: [autoResize],
+		props: {
+			config: {
+				type: Object,
+				default: () => ({}),
+			},
+		},
+		data() {
+			return {
+				ref: 'scroll-board',
+
+				defaultConfig: {
+					/**
+					 * @description Board header
+					 * @type {Array<String>}
+					 * @default header = []
+					 * @example header = ['column1', 'column2', 'column3']
+					 */
+					header: [],
+					/**
+					 * @description Board data
+					 * @type {Array<Array>}
+					 * @default data = []
+					 */
+					data: [],
+					/**
+					 * @description Row num
+					 * @type {Number}
+					 * @default rowNum = 5
+					 */
+					rowNum: 5,
+					/**
+					 * @description Header background color
+					 * @type {String}
+					 * @default headerBGC = '#00BAFF'
+					 */
+					headerBGC: '#00BAFF',
+					/**
+					 * @description Odd row background color
+					 * @type {String}
+					 * @default oddRowBGC = '#003B51'
+					 */
+					oddRowBGC: '#003B51',
+					/**
+					 * @description Even row background color
+					 * @type {String}
+					 * @default evenRowBGC = '#003B51'
+					 */
+					evenRowBGC: '#0A2732',
+					/**
+					 * @description Scroll wait time
+					 * @type {Number}
+					 * @default waitTime = 2000
+					 */
+					waitTime: 2000,
+					/**
+					 * @description Header height
+					 * @type {Number}
+					 * @default headerHeight = 35
+					 */
+					headerHeight: 35,
+					/**
+					 * @description Column width
+					 * @type {Array<Number>}
+					 * @default columnWidth = []
+					 */
+					columnWidth: [],
+					/**
+					 * @description Column align
+					 * @type {Array<String>}
+					 * @default align = []
+					 * @example align = ['left', 'center', 'right']
+					 */
+					align: [],
+					/**
+					 * @description Show index
+					 * @type {Boolean}
+					 * @default index = false
+					 */
+					index: false,
+					/**
+					 * @description index Header
+					 * @type {String}
+					 * @default indexHeader = '#'
+					 */
+					indexHeader: '#',
+					/**
+					 * @description Carousel type
+					 * @type {String}
+					 * @default carousel = 'single'
+					 * @example carousel = 'single' | 'page'
+					 */
+					carousel: 'single',
+					/**
+					 * @description Pause scroll when mouse hovered
+					 * @type {Boolean}
+					 * @default hoverPause = true
+					 * @example hoverPause = true | false
+					 */
+					hoverPause: true,
+				},
 
-      mergedConfig: null,
+				mergedConfig: null,
 
-      header: [],
+				header: [],
 
-      rowsData: [],
+				rowsData: [],
 
-      rows: [],
+				rows: [],
 
-      widths: [],
+				widths: [],
 
-      heights: [],
+				heights: [],
 
-      avgHeight: 0,
+				avgHeight: 0,
 
-      aligns: [],
+				aligns: [],
 
-      animationIndex: 0,
+				background: [],
 
-      animationHandler: '',
+				animationIndex: 0,
 
-      updater: 0,
+				animationHandler: '',
 
-      needCalc: false
-    }
-  },
-  watch: {
-    config () {
-      const { stopAnimation, calcData } = this
+				updater: 0,
 
-      stopAnimation()
+				needCalc: false,
+			}
+		},
+		watch: {
+			config() {
+				const { stopAnimation, calcData } = this
 
-      this.animationIndex = 0
+				stopAnimation()
 
-      calcData()
-    }
-  },
-  methods: {
-    handleHover(enter, ri, ci, row, ceil){
-      const { mergedConfig, emitEvent, stopAnimation, animation } = this
+				this.animationIndex = 0
 
-      if (enter) emitEvent('mouseover', ri, ci, row, ceil)
-      if (!mergedConfig.hoverPause) return
+				calcData()
+			},
+		},
+		methods: {
+			handleHover(enter, ri, ci, row, ceil) {
+				const { mergedConfig, emitEvent, stopAnimation, animation } = this
 
-      if (enter) {
-        stopAnimation()
-      } else {
-        animation(true)
-      }
-    },
-    afterAutoResizeMixinInit () {
-      const { calcData } = this
+				if (enter) emitEvent('mouseover', ri, ci, row, ceil)
+				if (!mergedConfig.hoverPause) return
 
-      calcData()
-    },
-    onResize () {
-      const { mergedConfig, calcWidths, calcHeights } = this
+				if (enter) {
+					stopAnimation()
+				} else {
+					animation(true)
+				}
+			},
+			afterAutoResizeMixinInit() {
+				const { calcData } = this
 
-      if (!mergedConfig) return
+				calcData()
+			},
+			onResize() {
+				const { mergedConfig, calcWidths, calcHeights } = this
 
-      calcWidths()
+				if (!mergedConfig) return
 
-      calcHeights()
-    },
-    calcData () {
-      const { mergeConfig, calcHeaderData, calcRowsData } = this
+				calcWidths()
 
-      mergeConfig()
+				calcHeights()
+			},
+			calcData() {
+				const { mergeConfig, calcHeaderData, calcRowsData } = this
 
-      calcHeaderData()
+				mergeConfig()
 
-      calcRowsData()
+				calcHeaderData()
 
-      const { calcWidths, calcHeights, calcAligns } = this
+				calcRowsData()
 
-      calcWidths()
+				const { calcWidths, calcHeights, calcAligns } = this
 
-      calcHeights()
+				calcWidths()
 
-      calcAligns()
+				calcHeights()
 
-      const { animation } = this
+				calcAligns()
 
-      animation(true)
-    },
-    mergeConfig () {
-      let { config, defaultConfig } = this
+				const { animation } = this
 
-      this.mergedConfig = deepMerge(deepClone(defaultConfig, true), config || {})
-    },
-    calcHeaderData () {
-      let { header, index, indexHeader} = this.mergedConfig
+				animation(true)
+			},
+			mergeConfig() {
+				let { config, defaultConfig } = this
 
-      if (!header.length) {
-        this.header = []
+				this.mergedConfig = deepMerge(
+					deepClone(defaultConfig, true),
+					config || {}
+				)
+			},
+			calcHeaderData() {
+				let { header, index, indexHeader } = this.mergedConfig
 
-        return
-      }
+				if (!header.length) {
+					this.header = []
 
-      header = [...header]
+					return
+				}
 
-      if (index) header.unshift(indexHeader)
+				header = [...header]
 
-      this.header = header
-    },
-    calcRowsData () {
-      let { data, index, headerBGC, rowNum } = this.mergedConfig
+				if (index) header.unshift(indexHeader)
 
-      if (index) {
-        data = data.map((row, i) => {
-          row = [...row]
+				this.header = header
+			},
+			calcRowsData() {
+				let { data, index, headerBGC, rowNum } = this.mergedConfig
 
-          const indexTag = `<span class="index" style="background-color: ${headerBGC};">${i + 1}</span>`
+				if (index) {
+					data = data.map((row, i) => {
+						row = [...row]
 
-          row.unshift(indexTag)
+						const indexTag = `<span class="index" style="background-color: ${headerBGC};">${
+							i + 1
+						}</span>`
 
-          return row
-        })
-      }
+						row.unshift(indexTag)
 
-      data = data.map((ceils, i) => ({ ceils, rowIndex: i }))
+						return row
+					})
+				}
 
-      const rowLength = data.length
+				data = data.map((ceils, i) => ({ ceils, rowIndex: i }))
 
-      if (rowLength > rowNum && rowLength < 2 * rowNum) {
-        data = [...data, ...data]
-      }
+				const rowLength = data.length
 
-      data = data.map((d, i) => ({ ...d, scroll: i }))
+				if (rowLength > rowNum && rowLength < 2 * rowNum) {
+					data = [...data, ...data]
+				}
 
-      this.rowsData = data
-      this.rows = data
-    },
-    calcWidths () {
-      const { width, mergedConfig, rowsData } = this
+				data = data.map((d, i) => ({ ...d, scroll: i }))
 
-      const { columnWidth, header } = mergedConfig
+				this.rowsData = data
+				this.rows = data
+			},
+			calcWidths() {
+				const { width, mergedConfig, rowsData } = this
 
-      const usedWidth = columnWidth.reduce((all, w) => all + w, 0)
+				const { columnWidth, header } = mergedConfig
 
-      let columnNum = 0
-      if (rowsData[0]) {
-        columnNum = rowsData[0].ceils.length
-      } else if (header.length) {
-        columnNum = header.length
-      }
+				const usedWidth = columnWidth.reduce((all, w) => all + w, 0)
 
-      const avgWidth = (width - usedWidth) / (columnNum - columnWidth.length)
+				let columnNum = 0
+				if (rowsData[0]) {
+					columnNum = rowsData[0].ceils.length
+				} else if (header.length) {
+					columnNum = header.length
+				}
 
-      const widths = new Array(columnNum).fill(avgWidth)
+				const avgWidth = (width - usedWidth) / (columnNum - columnWidth.length)
 
-      this.widths = deepMerge(widths, columnWidth)
-    },
-    calcHeights (onresize = false) {
-      const { height, mergedConfig, header } = this
+				const widths = new Array(columnNum).fill(avgWidth)
 
-      const { headerHeight, rowNum, data } = mergedConfig
+				this.widths = deepMerge(widths, columnWidth)
+			},
+			calcHeights(onresize = false) {
+				const { height, mergedConfig, header } = this
 
-      let allHeight = height
+				const { headerHeight, rowNum, data } = mergedConfig
 
-      if (header.length) allHeight -= headerHeight
+				let allHeight = height
 
-      const avgHeight = allHeight / rowNum
+				if (header.length) allHeight -= headerHeight
 
-      this.avgHeight = avgHeight
+				const avgHeight = allHeight / rowNum
 
-      if (!onresize) this.heights = new Array(data.length).fill(avgHeight)
-    },
-    calcAligns () {
-      const { header, mergedConfig } = this
+				this.avgHeight = avgHeight
 
-      const columnNum = header.length
+				if (!onresize) this.heights = new Array(data.length).fill(avgHeight)
+			},
+			calcAligns() {
+				const { header, mergedConfig } = this
 
-      let aligns = new Array(columnNum).fill('left')
+				const columnNum = header.length
 
-      const { align } = mergedConfig
+				let aligns = new Array(columnNum).fill('left')
 
-      this.aligns = deepMerge(aligns, align)
-    },
-    async animation (start = false) {
-      const { needCalc, calcHeights, calcRowsData } = this
+				const { align } = mergedConfig
 
-      if (needCalc) {
-        calcRowsData()
-        calcHeights()
-        this.needCalc = false
-      }
+				this.aligns = deepMerge(aligns, align)
+			},
+			calcBackground() {
+				const { data, mergedConfig } = this
 
-      let { avgHeight, animationIndex, mergedConfig, rowsData, animation, updater } = this
+				const columnNum = data.length
 
-      const { waitTime, carousel, rowNum } = mergedConfig
+				let backgrounds = new Array(columnNum).fill('')
 
-      const rowLength = rowsData.length
+				const { background } = mergedConfig
 
-      if (rowNum >= rowLength) return
+				this.aligns = deepMerge(backgrounds, background)
+			},
+			async animation(start = false) {
+				const { needCalc, calcHeights, calcRowsData } = this
 
-      if (start) {
-        await new Promise(resolve => setTimeout(resolve, waitTime))
-        if (updater !== this.updater) return
-      }
+				if (needCalc) {
+					calcRowsData()
+					calcHeights()
+					this.needCalc = false
+				}
 
-      const animationNum = carousel === 'single' ? 1 : rowNum
+				let {
+					avgHeight,
+					animationIndex,
+					mergedConfig,
+					rowsData,
+					animation,
+					updater,
+				} = this
 
-      let rows = rowsData.slice(animationIndex)
-      rows.push(...rowsData.slice(0, animationIndex))
+				const { waitTime, carousel, rowNum } = mergedConfig
 
-      this.rows = rows.slice(0, carousel === 'page' ? rowNum * 2 : rowNum + 1)
-      this.heights = new Array(rowLength).fill(avgHeight)
+				const rowLength = rowsData.length
 
-      await new Promise(resolve => setTimeout(resolve, 300))
-      if (updater !== this.updater) return
+				if (rowNum >= rowLength) return
 
-      this.heights.splice(0, animationNum, ...new Array(animationNum).fill(0))
+				if (start) {
+					await new Promise(resolve => setTimeout(resolve, waitTime))
+					if (updater !== this.updater) return
+				}
 
-      animationIndex += animationNum
+				const animationNum = carousel === 'single' ? 1 : rowNum
 
-      const back = animationIndex - rowLength
-      if (back >= 0) animationIndex = back
+				let rows = rowsData.slice(animationIndex)
+				rows.push(...rowsData.slice(0, animationIndex))
 
-      this.animationIndex = animationIndex
-      this.animationHandler = setTimeout(animation, waitTime - 300)
-    },
-    stopAnimation () {
-      const { animationHandler, updater } = this
+				this.rows = rows.slice(0, carousel === 'page' ? rowNum * 2 : rowNum + 1)
+				this.heights = new Array(rowLength).fill(avgHeight)
 
-      this.updater = (updater + 1) % 999999
+				await new Promise(resolve => setTimeout(resolve, 300))
+				if (updater !== this.updater) return
 
-      if (!animationHandler) return
+				this.heights.splice(0, animationNum, ...new Array(animationNum).fill(0))
 
-      clearTimeout(animationHandler)
-    },
-    emitEvent (type, ri, ci, row, ceil) {
-      const { ceils, rowIndex } = row
+				animationIndex += animationNum
 
-      this.$emit(type, {
-        row: ceils,
-        ceil,
-        rowIndex,
-        columnIndex: ci
-      })
-    },
-    updateRows(rows, animationIndex) {
-      const { mergedConfig, animationHandler, animation } = this
+				const back = animationIndex - rowLength
+				if (back >= 0) animationIndex = back
 
-      this.mergedConfig = {
-        ...mergedConfig,
-        data: [...rows]
-      }
+				this.animationIndex = animationIndex
+				this.animationHandler = setTimeout(animation, waitTime - 300)
+			},
+			stopAnimation() {
+				const { animationHandler, updater } = this
 
-      this.needCalc = true
+				this.updater = (updater + 1) % 999999
 
-      if (typeof animationIndex === 'number') this.animationIndex = animationIndex
-      if (!animationHandler) animation(true)
-    }
-  },
-  destroyed () {
-    const { stopAnimation } = this
+				if (!animationHandler) return
 
-    stopAnimation()
-  }
-}
+				clearTimeout(animationHandler)
+			},
+			emitEvent(type, ri, ci, row, ceil) {
+				const { ceils, rowIndex } = row
+
+				this.$emit(type, {
+					row: ceils,
+					ceil,
+					rowIndex,
+					columnIndex: ci,
+				})
+			},
+			updateRows(rows, animationIndex) {
+				const { mergedConfig, animationHandler, animation } = this
+
+				this.mergedConfig = {
+					...mergedConfig,
+					data: [...rows],
+				}
+
+				this.needCalc = true
+
+				if (typeof animationIndex === 'number')
+					this.animationIndex = animationIndex
+				if (!animationHandler) animation(true)
+			},
+		},
+		destroyed() {
+			const { stopAnimation } = this
+
+			stopAnimation()
+		},
+	}
 </script>
 
 <style lang="less">
-.dv-scroll-board {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  color: #fff;
+	.dv-scroll-board {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		color: #fff;
 
-  .text {
-    padding: 0 10px;
-    box-sizing: border-box;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
+		.text {
+			padding: 0 10px;
+			box-sizing: border-box;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 
-  .header {
-    display: flex;
-    flex-direction: row;
-    font-size: 15px;
+		.header {
+			display: flex;
+			flex-direction: row;
+			font-size: 15px;
 
-    .header-item {
-      .text;
-      transition: all 0.3s;
-    }
-  }
+			.header-item {
+				.text;
+				transition: all 0.3s;
+			}
+		}
 
-  .rows {
-    overflow: hidden;
+		.rows {
+			overflow: hidden;
 
-    .row-item {
-      display: flex;
-      font-size: 14px;
-      transition: all 0.3s;
-    }
+			.row-item {
+				display: flex;
+				font-size: 14px;
+				transition: all 0.3s;
+			}
 
-    .ceil {
-      .text;
-    }
+			.ceil {
+				.text;
+			}
 
-    .index {
-      border-radius: 3px;
-      padding: 0px 3px;
-    }
-  }
-}
+			.index {
+				border-radius: 3px;
+				padding: 0px 3px;
+			}
+		}
+	}
 </style>
