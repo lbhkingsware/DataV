@@ -33,10 +33,10 @@
 				:style="`
           height: ${heights[ri]}px;
           line-height: ${heights[ri]}px;
+          background: ${backgrounds[ri]};
           background-color: ${
 						mergedConfig[row.rowIndex % 2 === 0 ? 'evenRowBGC' : 'oddRowBGC']
 					};
-          background: ${backgrounds[ri]};
         `"
 			>
 				<div
@@ -251,7 +251,7 @@
 				calcAligns()
 
 				calcBackground()
-				console.log('background', this.background)
+				console.log('background', this.backgrounds)
 
 				const { animation } = this
 
@@ -357,9 +357,9 @@
 				this.aligns = deepMerge(aligns, align)
 			},
 			calcBackground() {
-				const { data, mergedConfig } = this
+				const { rows, mergedConfig } = this
 
-				const columnNum = data.length
+				const columnNum = rows.length
 
 				let backgrounds = new Array(columnNum).fill('')
 
