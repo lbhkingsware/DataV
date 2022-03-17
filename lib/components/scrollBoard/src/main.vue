@@ -164,6 +164,8 @@
 					 * @example hoverPause = true | false
 					 */
 					hoverPause: true,
+
+					background: [],
 				},
 
 				mergedConfig: null,
