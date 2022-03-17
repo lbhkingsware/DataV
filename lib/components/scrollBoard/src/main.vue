@@ -458,7 +458,7 @@
 		},
 	}
 </script>
-
+<style lang="less" scoped>
 	.dv-scroll-board {
 		position: relative;
 		width: 100%;
