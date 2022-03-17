@@ -361,7 +361,7 @@
 
 				const columnNum = rows.length
 
-				let backgrounds = new Array(columnNum).fill(' ')
+				let backgrounds = new Array(columnNum).fill('')
 
 				const { background } = mergedConfig
 
