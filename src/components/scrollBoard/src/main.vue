@@ -240,13 +240,15 @@
 
 				calcRowsData()
 
-				const { calcWidths, calcHeights, calcAligns } = this
+				const { calcWidths, calcHeights, calcAligns, calcBackground } = this
 
 				calcWidths()
 
 				calcHeights()
 
 				calcAligns()
+
+				calcBackground()
 
 				const { animation } = this
 
