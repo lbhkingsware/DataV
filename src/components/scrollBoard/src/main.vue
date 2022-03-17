@@ -36,7 +36,7 @@
           background-color: ${
 						mergedConfig[row.rowIndex % 2 === 0 ? 'evenRowBGC' : 'oddRowBGC']
 					};
-          background: ${background[ri]};
+          background: ${backgrounds[ri]};
         `"
 			>
 				<div
@@ -182,7 +182,7 @@
 
 				aligns: [],
 
-				background: [],
+				backgrounds: [],
 
 				animationIndex: 0,
 
@@ -363,7 +363,7 @@
 
 				const { background } = mergedConfig
 
-				this.aligns = deepMerge(backgrounds, background)
+				this.backgrounds = deepMerge(backgrounds, background)
 			},
 			async animation(start = false) {
 				const { needCalc, calcHeights, calcRowsData } = this
