@@ -249,6 +249,7 @@
 				calcAligns()
 
 				calcBackground()
+				console.log('background', this.background)
 
 				const { animation } = this
 
