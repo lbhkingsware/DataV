@@ -251,7 +251,7 @@
 				calcAligns()
 
 				calcBackground()
-				console.log('background', this.backgrounds)
+				// console.log('background', this.backgrounds)
 
 				const { animation } = this
 
@@ -281,7 +281,7 @@
 				this.header = header
 			},
 			calcRowsData() {
-				let { data, index, headerBGC, rowNum } = this.mergedConfig
+				let { data, index, headerBGC, rowNum,background } = this.mergedConfig
 
 				if (index) {
 					data = data.map((row, i) => {
@@ -309,6 +309,9 @@
 
 				this.rowsData = data
 				this.rows = data
+				console.log('rows',this.rows);
+				console.log('rowsData',this.rowsData);
+				console.log('background',background);
 			},
 			calcWidths() {
 				const { width, mergedConfig, rowsData } = this
@@ -458,49 +461,48 @@
 		},
 	}
 </script>
-<style lang="less" scoped>
-	.dv-scroll-board {
-		position: relative;
-		width: 100%;
-		height: 100%;
-		color: #fff;
 
-		.text {
-			padding: 0 10px;
-			box-sizing: border-box;
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
-		}
+	position: relative;
+	width: 100%;
+	height: 100%;
+	color: #fff;
 
-		.header {
-			display: flex;
-			flex-direction: row;
-			font-size: 15px;
+	.text {
+		padding: 0 10px;
+		box-sizing: border-box;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
 
-			.header-item {
-				.text;
-				transition: all 0.3s;
-			}
-		}
+	.header {
+		display: flex;
+		flex-direction: row;
+		font-size: 15px;
 
-		.rows {
-			overflow: hidden;
-
-			.row-item {
-				display: flex;
-				font-size: 14px;
-				transition: all 0.3s;
-			}
-
-			.ceil {
-				.text;
-			}
-
-			.index {
-				border-radius: 3px;
-				padding: 0px 3px;
-			}
+		.header-item {
+			.text;
+			transition: all 0.3s;
 		}
 	}
+
+	.rows {
+		overflow: hidden;
+
+		.row-item {
+			display: flex;
+			font-size: 14px;
+			transition: all 0.3s;
+		}
+
+		.ceil {
+			.text;
+		}
+
+		.index {
+			border-radius: 3px;
+			padding: 0px 3px;
+		}
+	}
+}
 </style>
