@@ -33,7 +33,7 @@
         :style="`
           height: ${heights[ri]}px;
           line-height: ${heights[ri]}px;
-          background: ${rows.backgrounds};
+          background: ${rows.background};
           background-color: ${
             mergedConfig[row.rowIndex % 2 === 0 ? 'evenRowBGC' : 'oddRowBGC']
           };
