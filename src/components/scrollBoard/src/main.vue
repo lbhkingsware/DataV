@@ -43,7 +43,7 @@
           class="ceil"
           v-for="(ceil, ci) in row.ceils"
           :key="`${ceil}${ri}${ci}`"
-          :style="`width: ${widths[ci]}px;`"
+          :style="`width: ${widths[ci]}px;height: ${heights[ri]}px;`"
           :align="aligns[ci]"
           v-html="ceil"
           @click="emitEvent('click', ri, ci, row, ceil)"
@@ -407,7 +407,7 @@ export default {
       this.rows = rows.slice(0, carousel === 'page' ? rowNum * 2 : rowNum + 1)
       this.heights = new Array(rowLength).fill(avgHeight)
 
-      // await new Promise(resolve => setTimeout(resolve, 300))
+      await new Promise(resolve => setTimeout(resolve, 300))
       if (updater !== this.updater) return
 
       this.heights.splice(0, animationNum, ...new Array(animationNum).fill(0))
@@ -499,6 +499,8 @@ export default {
 
     .ceil {
       .text;
+      transition: all 0s;
+      overflow: hidden;
     }
 
     .index {
