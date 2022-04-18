@@ -33,7 +33,7 @@
         :style="`
           height: ${heights[ri]}px;
           line-height: ${heights[ri]}px;
-          background: ${backgrounds[ri]};
+          background: ${rows.backgrounds};
           background-color: ${
             mergedConfig[row.rowIndex % 2 === 0 ? 'evenRowBGC' : 'oddRowBGC']
           };
@@ -251,7 +251,6 @@ export default {
       calcAligns()
 
       calcBackground()
-      // console.log('background', this.backgrounds)
 
       const { animation } = this
 
@@ -305,13 +304,14 @@ export default {
         data = [...data, ...data]
       }
 
-      data = data.map((d, i) => ({ ...d, scroll: i }))
+      data = data.map((d, i) => ({
+        ...d,
+        scroll: i,
+        background: background[i]
+      }))
 
       this.rowsData = data
       this.rows = data
-      console.log('rows', this.rows)
-      console.log('rowsData', this.rowsData)
-      console.log('background', background)
     },
     calcWidths() {
       const { width, mergedConfig, rowsData } = this
